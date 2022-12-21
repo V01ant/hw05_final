@@ -139,8 +139,8 @@ def profile_follow(request, username):
         if author.pk not in request.user.follower.all().values_list(
         'author',
         flat=True
-    ):
-         return redirect('posts:follow_index')
+        ):
+            return redirect('posts:follow_index')
     Follow.objects.create(user=user, author=author)
     return redirect('posts:follow_index')
 
