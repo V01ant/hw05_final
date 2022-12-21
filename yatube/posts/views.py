@@ -33,13 +33,10 @@ def group_posts(request, slug):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.all()
-    if author.pk in request.user.follower.all().values_list(
-        'author',
-        flat=True
-    ):
-        following = True
-    else:
-        following = False
+    following = Follow.objects.filter(
+        user=request.user.is_authenticated,
+        author=author
+    ).exists()
     page_obj = pagin_func(request, post_list, settings.COUNT_OF_MESSAGES)
     context = {
         'author': author,

@@ -46,7 +46,6 @@ class PostURLTests(TestCase):
         pages_for_authorized_client = [
             '/create/',
             f'/posts/{self.post.pk}/edit/',
-            f'/profile/{self.user.username}/',
         ]
         for url in app_pages:
             with self.subTest(url=url):
@@ -77,7 +76,6 @@ class PostURLTests(TestCase):
         pages_for_authorized_client = [
             '/create/',
             f'/posts/{self.post.pk}/edit/',
-            f'/profile/{self.user.username}/',
         ]
         for url, template in url_template_names.items():
             with self.subTest(url=url):
