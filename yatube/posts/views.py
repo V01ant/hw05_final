@@ -33,10 +33,10 @@ def group_posts(request, slug):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.all()
-    following = Follow.objects.filter(
-        user=request.user.is_authenticated,
-        author=author
-    ).exists()
+    following = (
+        request.user.is_authenticated
+        and Follow.objects.filter(author=author).exists()
+    )
     page_obj = pagin_func(request, post_list, settings.COUNT_OF_MESSAGES)
     context = {
         'author': author,
@@ -114,13 +114,7 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    users_id_list = request.user.follower.all().values_list(
-        'author',
-        flat=True
-    )
-    post_list = Post.objects.filter(author__in=users_id_list).order_by(
-        '-pub_date'
-    )
+    post_list = Post.objects.filter(author__following__user=request.user)
     page_obj = pagin_func(request, post_list, settings.COUNT_OF_MESSAGES)
     context = {
         'page_obj': page_obj,
@@ -143,9 +137,7 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    user = request.user
     author = get_object_or_404(User, username=username)
-    if author == user:
-        return redirect('posts:follow_index')
-    Follow.objects.filter(user=user, author=author).delete()
+    if Follow.objects.filter(author__following__user=request.user).exists():
+        Follow.objects.filter(user=request.user, author=author).delete()
     return redirect('posts:follow_index')
